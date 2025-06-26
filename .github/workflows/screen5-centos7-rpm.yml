@@ -12,6 +12,7 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
+          # 更换镜像源
           curl -sSL https://linuxmirrors.cn/main.sh -o ./main.sh
           bash ./main.sh \
             --source mirrors.aliyun.com \
@@ -22,11 +23,11 @@ jobs:
             --upgrade-software false \
             --clean-cache false \
             --ignore-backup-tips
-          
+
+          # 安装构建依赖
           yum -y update
           yum -y groupinstall "Development Tools"
-          yum -y install ncurses-devel wget tar epel-release
-          yum -y install checkinstall
+          yum -y install ncurses-devel wget tar rpm-build
 
       - name: Download GNU Screen source
         run: |
@@ -34,20 +35,55 @@ jobs:
           wget https://ftp.gnu.org/gnu/screen/screen-${SCREEN_VERSION}.tar.gz
           tar xzf screen-${SCREEN_VERSION}.tar.gz
 
-      - name: Build RPM with checkinstall
+      - name: Prepare rpmbuild structure
         run: |
-          cd screen-5.0.1
-          ./configure
-          make -j$(nproc)
-          checkinstall -y --install=no --pkgname=screen --pkgversion=5.0.1 --pkgrelease=1 --pkglicense=GPL --pkgsource=gnu.org
+          mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+          cp screen-5.0.1.tar.gz ~/rpmbuild/SOURCES/
 
-      - name: Move RPM to known location
+      - name: Create screen.spec file
         run: |
-          mkdir -p /tmp/artifacts
-          mv screen-5.0.1-1.x86_64.rpm /tmp/artifacts/
+          cat > ~/rpmbuild/SPECS/screen.spec <<EOF
+          Name:           screen
+          Version:        5.0.1
+          Release:        1%{?dist}
+          Summary:        Terminal multiplexer
+
+          License:        GPL
+          URL:            https://www.gnu.org/software/screen/
+          Source0:        screen-5.0.1.tar.gz
+
+          BuildRequires:  ncurses-devel
+
+          %description
+          Screen is a full-screen window manager that multiplexes a physical terminal between several processes.
+
+          %prep
+          %setup -q
+
+          %build
+          ./configure --prefix=/usr
+          make -j$(nproc)
+
+          %install
+          rm -rf %{buildroot}
+          make install DESTDIR=%{buildroot}
+
+          %files
+          /usr/bin/screen
+          /usr/share/screen
+          /usr/share/man/man1/screen.1.gz
+
+          %changelog
+          * Thu Jun 26 2025 GitHub Actions <noreply@github.com> - 5.0.1-1
+          - Initial RPM release
+          EOF
+
+      - name: Build RPM
+        run: |
+          rpmbuild -ba ~/rpmbuild/SPECS/screen.spec
 
       - name: Upload RPM as artifact
         uses: actions/upload-artifact@v4
         with:
           name: screen-rpm
-          path: /tmp/artifacts/screen-5.0.1-1.x86_64.rpm
+          path: ~/rpmbuild/RPMS/x86_64/screen-5.0.1-1.el7.x86_64.rpm
