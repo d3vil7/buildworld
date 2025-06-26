@@ -12,7 +12,8 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
-          bash <(curl -sSL https://linuxmirrors.cn/main.sh) \
+          curl -sSL https://linuxmirrors.cn/main.sh -o ./main.sh
+          bash ./main.sh \
             --source mirrors.mit.edu \
             --protocol http \
             --use-intranet-source false \
