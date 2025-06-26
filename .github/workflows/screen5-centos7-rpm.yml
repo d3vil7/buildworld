@@ -12,6 +12,16 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
+          bash <(curl -sSL https://linuxmirrors.cn/main.sh) \
+            --source mirrors.mit.edu \
+            --protocol http \
+            --use-intranet-source false \
+            --install-epel true \
+            --backup true \
+            --upgrade-software false \
+            --clean-cache false \
+            --ignore-backup-tips
+          
           yum -y update
           yum -y groupinstall "Development Tools"
           yum -y install ncurses-devel wget tar epel-release
