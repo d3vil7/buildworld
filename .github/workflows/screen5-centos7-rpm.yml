@@ -1,0 +1,42 @@
+name: Build GNU Screen RPM on CentOS 7
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-rpm:
+    runs-on: ubuntu-latest
+    container:
+      image: centos:7
+
+    steps:
+      - name: Install dependencies
+        run: |
+          yum -y update
+          yum -y groupinstall "Development Tools"
+          yum -y install ncurses-devel wget tar epel-release
+          yum -y install checkinstall
+
+      - name: Download GNU Screen source
+        run: |
+          SCREEN_VERSION=5.0.1
+          wget https://ftp.gnu.org/gnu/screen/screen-${SCREEN_VERSION}.tar.gz
+          tar xzf screen-${SCREEN_VERSION}.tar.gz
+
+      - name: Build RPM with checkinstall
+        run: |
+          cd screen-5.0.1
+          ./configure
+          make -j$(nproc)
+          checkinstall -y --install=no --pkgname=screen --pkgversion=5.0.1 --pkgrelease=1 --pkglicense=GPL --pkgsource=gnu.org
+
+      - name: Move RPM to known location
+        run: |
+          mkdir -p /tmp/artifacts
+          mv screen-5.0.1-1.x86_64.rpm /tmp/artifacts/
+
+      - name: Upload RPM as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: screen-rpm
+          path: /tmp/artifacts/screen-5.0.1-1.x86_64.rpm
