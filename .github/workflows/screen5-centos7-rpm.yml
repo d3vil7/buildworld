@@ -27,7 +27,7 @@ jobs:
           # 安装构建依赖
           yum -y update
           yum -y groupinstall "Development Tools"
-          yum -y install ncurses-devel wget tar rpm-build
+          yum -y install ncurses-devel wget tar rpm-build pam-devel
 
       - name: Download GNU Screen source
         run: |
@@ -61,7 +61,7 @@ jobs:
           %setup -q
 
           %build
-          ./configure --prefix=/usr --without-pam
+          ./configure --prefix=/usr
           make -j$(nproc)
 
           %install
