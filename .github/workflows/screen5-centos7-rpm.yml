@@ -13,7 +13,7 @@ jobs:
 
       - name: Build screen in CentOS 7 container
         run: |
-          docker run --rm -v $PWD:/workspace -w /workspace centos:7 /bin/bash -c '
+          docker run --rm -v $PWD:/workspace -w /workspace centos:7 /bin/bash -c
           # 更换镜像源
           curl -sSL https://linuxmirrors.cn/main.sh -o ./main.sh
           bash ./main.sh \
