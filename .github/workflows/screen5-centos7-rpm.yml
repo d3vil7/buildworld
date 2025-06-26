@@ -14,8 +14,8 @@ jobs:
         run: |
           curl -sSL https://linuxmirrors.cn/main.sh -o ./main.sh
           bash ./main.sh \
-            --source mirrors.mit.edu \
-            --protocol http \
+            --source mirrors.aliyun.com \
+            --protocol https \
             --use-intranet-source false \
             --install-epel true \
             --backup true \
