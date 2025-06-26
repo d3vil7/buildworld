@@ -62,7 +62,7 @@ jobs:
 
           %build
           ./configure --prefix=/usr
-          make -j$(nproc)
+          make -j$(nproc) CFLAGS="-std=gnu11"
 
           %install
           rm -rf %{buildroot}
