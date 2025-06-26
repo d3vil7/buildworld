@@ -37,11 +37,11 @@ jobs:
             tar xzf screen-${SCREEN_VERSION}.tar.gz
 
             # 准备 rpmbuild 目录结构
-            mkdir -p ~/rpmbuild/{{BUILD,RPMS,SOURCES,SPECS,SRPMS}}
+            mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
             cp screen-5.0.1.tar.gz ~/rpmbuild/SOURCES/
 
             # 创建 SPEC 文件
-            cat > ~/rpmbuild/SPECS/screen.spec <<EOF
+            cat > ~/rpmbuild/SPECS/screen.spec <<'EOF'
             Name:           screen
             Version:        5.0.1
             Release:        1%{?dist}
