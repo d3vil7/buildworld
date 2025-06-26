@@ -71,6 +71,7 @@ jobs:
           %files
           /usr/bin/screen
           /usr/share/screen
+          /usr/bin/screen-5.0.1
           /usr/share/man/man1/screen.1.gz
 
           %changelog
