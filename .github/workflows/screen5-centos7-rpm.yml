@@ -61,7 +61,7 @@ jobs:
           %setup -q
 
           %build
-          ./configure --prefix=/usr
+          ./configure --prefix=/usr --without-pam
           make -j$(nproc)
 
           %install
